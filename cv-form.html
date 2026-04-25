@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CV Builder</title>
+  <style>
+    :root {
+      --topbar-height: 50px;
+      --green: #1b5e20;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #1c1c1c;
+    }
+
+    #topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--topbar-height);
+      background: #1a2540;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 18px;
+      z-index: 10;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #topbar select,
+    #topbar button {
+      height: 32px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      background: #fff;
+      color: #1a2540;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    #topbar button {
+      padding: 0 12px;
+      font-weight: 700;
+    }
+
+    #formPanel,
+    #previewPanel {
+      position: fixed;
+      top: var(--topbar-height);
+      bottom: 0;
+      width: 50vw;
+      overflow-y: auto;
+    }
+
+    #formPanel {
+      left: 0;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    #previewPanel {
+      right: 0;
+      background: #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px;
+    }
+
+    .form-section {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+
+    .form-section summary {
+      padding: 12px 14px;
+      font-weight: 800;
+      cursor: pointer;
+      background: #fdfdfd;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .section-body {
+      padding: 14px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #444;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #cfcfcf;
+      border-radius: 4px;
+      padding: 8px 9px;
+      font: inherit;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    .entry-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background: #fafafa;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .entry-headline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .entry-headline strong {
+      font-size: 13px;
+    }
+
+    .remove-btn,
+    .add-btn {
+      border: 0;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .remove-btn {
+      background: #e8e8e8;
+      color: #333;
+      padding: 5px 8px;
+    }
+
+    .add-btn {
+      background: #1a2540;
+      color: #fff;
+      padding: 8px 10px;
+    }
+
+    .nested-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .row-with-remove {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .photo-upload-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    #a4Card {
+      width: 210mm;
+      min-height: 297mm;
+      background: #fff;
+      display: grid;
+      grid-template-columns: 34% 66%;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      background: #f4f8f4;
+      padding: 16px 15px;
+      border-right: 4px solid var(--green);
+    }
+
+    .content {
+      padding: 18px 20px 16px;
+    }
+
+    .photo {
+      width: 104px;
+      height: 104px;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+      margin: 0 auto 12px;
+      border: 3px solid var(--green);
+    }
+
+    .photo[src=""] {
+      display: none;
+    }
+
+    .hero {
+      border-bottom: 3px solid var(--green);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 27px;
+      letter-spacing: 0.4px;
+    }
+
+    .headline {
+      margin: 4px 0 0;
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    h2 {
+      margin: 0 0 7px;
+      font-size: 15px;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 12.5px;
+    }
+
+    .sidebar-block,
+    .content-block {
+      margin-bottom: 11px;
+    }
+
+    .entry {
+      margin-bottom: 9px;
+      break-inside: avoid;
+    }
+
+    .entry-head {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .entry-head span {
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .muted {
+      color: #666;
+      margin: 2px 0 5px;
+      font-size: 11px;
+    }
+
+    p,
+    li {
+      font-size: 11.7px;
+      line-height: 1.3;
+    }
+
+    ul {
+      margin: 5px 0 0 15px;
+      padding: 0;
+    }
+
+    .project p {
+      margin: 3px 0 0;
+    }
+
+    .sidebar .sidebar-block .sidebar-block {
+      margin-bottom: 7px;
+    }
+
+    .contact p {
+      margin: 2px 0;
+    }
+
+    .project .entry-head {
+      align-items: center;
+    }
+
+    .project .entry-head h3 {
+      font-size: 13px;
+      color: #1c1c1c;
+    }
+
+    .project .entry-head span {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #4a4a4a;
+    }
+
+    .project p {
+      color: #333;
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      html,
+      body {
+        height: auto;
+        overflow: visible;
+        background: #fff;
+      }
+
+      #topbar,
+      #formPanel {
+        display: none !important;
+      }
+
+      #previewPanel {
+        position: static;
+        display: block;
+        width: auto;
+        height: auto;
+        overflow: visible;
+        padding: 0;
+        background: #fff;
+      }
+
+      #a4Card {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="topbar">
+    <strong>CV Builder</strong>
+    <div class="topbar-actions">
+      <select id="profileSelect" onchange="loadProfile(this.value)">
+        <option value="">Profile</option>
+        <option value="ds">Data Scientist</option>
+        <option value="da">Data Analyst</option>
+        <option value="bi">BI Developer</option>
+        <option value="rc">Risk Credit</option>
+        <option value="rm">Risk Management</option>
+      </select>
+      <input type="file" id="uploadInput" accept=".json" hidden onchange="loadJSON(this.files[0])">
+      <button type="button" onclick="document.getElementById('uploadInput').click()">Upload JSON</button>
+      <input type="file" id="topbarPhotoUploadInput" accept="image/*" hidden onchange="uploadPhoto(this.files[0])">
+      <button type="button" onclick="document.getElementById('topbarPhotoUploadInput').click()">Upload Photo</button>
+      <button type="button" onclick="exportJSON()">Export JSON</button>
+      <button type="button" onclick="downloadPDF()">Download PDF</button>
+    </div>
+  </div>
+
+  <div id="formPanel">
+    <details class="form-section" open>
+      <summary>Basics</summary>
+      <div class="section-body field-grid">
+        <label>Name<input type="text" id="basics-name"></label>
+        <label>Email<input type="text" id="basics-email"></label>
+        <label>Phone<input type="text" id="basics-phone"></label>
+        <label>Location<input type="text" id="basics-location"></label>
+        <label>LinkedIn<input type="text" id="basics-linkedin"></label>
+        <label>Headline<input type="text" id="basics-headline"></label>
+        <label>Photo
+          <div class="photo-upload-row">
+            <input type="text" id="basics-photo">
+            <input type="file" id="photoUploadInput" accept="image/*" hidden onchange="uploadPhoto(this.files[0])">
+            <button type="button" class="add-btn" onclick="document.getElementById('photoUploadInput').click()">Upload</button>
+          </div>
+        </label>
+      </div>
+    </details>
+
+    <details class="form-section" open>
+      <summary>Summary</summary>
+      <div class="section-body">
+        <div id="summaryList"></div>
+        <button type="button" class="add-btn" onclick="addEntry('summaryList', TEMPLATES.summary)">Add Bullet</button>
+      </div>
+    </details>
+
+    <details class="form-section" open>
+      <summary>Experience</summary>
+      <div class="section-body">
+        <div id="experienceList"></div>
+        <button type="button" class="add-btn" onclick="addEntry('experienceList', TEMPLATES.experience)">Add Entry</button>
+      </div>
+    </details>
+
+    <details class="form-section" open>
+      <summary>Projects</summary>
+      <div class="section-body">
+        <div id="projectsList"></div>
+        <button type="button" class="add-btn" onclick="addEntry('projectsList', TEMPLATES.project)">Add Entry</button>
+      </div>
+    </details>
+
+    <details class="form-section" open>
+      <summary>Education</summary>
+      <div class="section-body">
+        <div id="educationList"></div>
+        <button type="button" class="add-btn" onclick="addEntry('educationList', TEMPLATES.education)">Add Entry</button>
+      </div>
+    </details>
+
+    <details class="form-section" open>
+      <summary>Skills</summary>
+      <div class="section-body">
+        <div id="skillsList"></div>
+        <button type="button" class="add-btn" onclick="addEntry('skillsList', TEMPLATES.skill)">Add Group</button>
+      </div>
+    </details>
+
+    <details class="form-section" open>
+      <summary>Languages</summary>
+      <div class="section-body">
+        <div id="languagesList"></div>
+        <button type="button" class="add-btn" onclick="addEntry('languagesList', TEMPLATES.language)">Add Language</button>
+      </div>
+    </details>
+
+    <details class="form-section" open>
+      <summary>Strengths</summary>
+      <div class="section-body">
+        <div id="strengthsList"></div>
+        <button type="button" class="add-btn" onclick="addEntry('strengthsList', TEMPLATES.strength)">Add Strength</button>
+      </div>
+    </details>
+  </div>
+
+  <div id="previewPanel">
+    <main id="a4Card" class="page">
+      <aside class="sidebar">
+        <img id="prev-photo" class="photo" src="" alt="">
+        <section class="sidebar-block contact">
+          <h2>Contact</h2>
+          <div id="prev-contact"></div>
+        </section>
+        <div id="prev-education"></div>
+        <div id="prev-skills"></div>
+        <div id="prev-languages"></div>
+        <div id="prev-strengths"></div>
+      </aside>
+      <section class="content">
+        <header class="hero">
+          <h1 id="prev-name"></h1>
+          <p id="prev-headline" class="headline"></p>
+        </header>
+        <div id="prev-summary"></div>
+        <div id="prev-experience"></div>
+        <div id="prev-projects"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const BASE_BASICS = {
+      name: "Candidate Name",
+      email: "",
+      phone: "",
+      location: "City, Country",
+      linkedin: "",
+      photo: ""
+    };
+
+    const PROFILES = {
+      ds: {
+        role_name: "Data Scientist CV",
+        output_basename: "data_scientist_cv",
+        basics: { ...BASE_BASICS, headline: "Data Scientist | Machine Learning & Analytics" },
+        summary: [
+          "Data scientist focused on turning business questions into measurable modeling and analytics outcomes.",
+          "Experienced with Python, SQL, experimentation, feature engineering, and model evaluation workflows.",
+          "Builds interpretable dashboards and analysis narratives for technical and non-technical stakeholders.",
+          "Comfortable moving from raw data exploration to production-ready recommendations.",
+          "Strong foundation in statistics, predictive modeling, and applied machine learning."
+        ],
+        skills: [
+          { category: "Programming", items: ["Python", "SQL", "Pandas", "NumPy"] },
+          { category: "Machine Learning", items: ["Scikit-learn", "Feature Engineering", "Model Evaluation"] },
+          { category: "Analytics", items: ["A/B Testing", "Forecasting", "Data Visualization"] }
+        ],
+        projects: [
+          { name: "Customer Churn Model", stack: "Python, SQL, Scikit-learn", description: "Built a churn prediction pipeline with explainable drivers and retention segments." },
+          { name: "Demand Forecasting", stack: "Python, Time Series", description: "Created forecasting models to support planning and inventory decisions." },
+          { name: "Experimentation Dashboard", stack: "SQL, Power BI", description: "Designed KPI monitoring for experiment readouts and product performance." }
+        ]
+      },
+      da: {
+        role_name: "Data Analyst CV",
+        output_basename: "data_analyst_cv",
+        basics: { ...BASE_BASICS, headline: "Data Analyst | BI, SQL & Business Insights" },
+        summary: [
+          "Data analyst specializing in KPI design, reporting automation, and business performance monitoring.",
+          "Transforms operational data into concise dashboards, analysis packs, and decision-ready insights.",
+          "Experienced in SQL querying, data cleaning, Excel modeling, and BI dashboard development.",
+          "Partners with teams to define metrics, detect anomalies, and communicate trends clearly."
+        ],
+        skills: [
+          { category: "Analysis", items: ["SQL", "Excel", "Python", "Data Cleaning"] },
+          { category: "BI", items: ["Power BI", "Dashboards", "KPI Design"] },
+          { category: "Business", items: ["Reporting", "Stakeholder Communication", "Process Analysis"] }
+        ],
+        projects: [
+          { name: "Executive KPI Dashboard", stack: "Power BI, SQL", description: "Delivered a consolidated dashboard for revenue, operations, and customer metrics." },
+          { name: "Reporting Automation", stack: "Python, Excel", description: "Automated recurring reports and reduced manual preparation time." },
+          { name: "Sales Funnel Analysis", stack: "SQL, Power BI", description: "Analyzed conversion points and highlighted pipeline improvement opportunities." }
+        ]
+      },
+      bi: {
+        role_name: "BI Developer CV",
+        output_basename: "bi_developer_cv",
+        basics: { ...BASE_BASICS, headline: "BI Developer | Data Modeling & Reporting" },
+        summary: [
+          "BI developer focused on reliable reporting layers, semantic models, and scalable dashboards.",
+          "Builds clean data models that make business metrics consistent across reporting surfaces.",
+          "Experienced with Power BI, SQL, DAX, data quality checks, and stakeholder-focused dashboard design.",
+          "Improves reporting performance and maintainability through structured models and clear definitions."
+        ],
+        skills: [
+          { category: "BI Tools", items: ["Power BI", "DAX", "Power Query"] },
+          { category: "Data", items: ["SQL", "Data Modeling", "ETL"] },
+          { category: "Delivery", items: ["Dashboard Design", "Requirements Gathering", "Documentation"] }
+        ],
+        projects: [
+          { name: "Finance BI Model", stack: "Power BI, DAX", description: "Built a reusable financial reporting model with standardized KPIs." },
+          { name: "Operations Dashboard", stack: "SQL, Power BI", description: "Created operational visibility across backlog, throughput, and SLA metrics." },
+          { name: "Data Quality Monitor", stack: "SQL", description: "Implemented checks to surface missing, duplicate, and inconsistent reporting records." }
+        ]
+      },
+      rc: {
+        role_name: "Credit Risk CV",
+        output_basename: "credit_risk_cv",
+        basics: { ...BASE_BASICS, headline: "Credit Risk Analyst | Portfolio Analytics & Scoring" },
+        summary: [
+          "Credit risk analyst focused on portfolio monitoring, risk segmentation, and decision analytics.",
+          "Uses data analysis to evaluate exposure, delinquency, provisioning indicators, and customer risk patterns.",
+          "Experienced with SQL, Python, Excel, scorecard logic, and dashboard reporting for risk stakeholders.",
+          "Turns risk data into clear recommendations for policy, monitoring, and portfolio action."
+        ],
+        skills: [
+          { category: "Risk", items: ["Credit Risk", "Portfolio Monitoring", "Risk Segmentation"] },
+          { category: "Analytics", items: ["SQL", "Python", "Excel", "Power BI"] },
+          { category: "Models", items: ["Scorecards", "PD Analysis", "Vintage Analysis"] }
+        ],
+        projects: [
+          { name: "Credit Portfolio Dashboard", stack: "Power BI, SQL", description: "Tracked exposure, arrears, and portfolio risk trends across customer segments." },
+          { name: "Scorecard Monitoring", stack: "Python, Excel", description: "Analyzed score band performance and stability across monthly cohorts." },
+          { name: "Delinquency Analysis", stack: "SQL, Python", description: "Identified drivers of early delinquency and recommended targeted monitoring actions." }
+        ]
+      },
+      rm: {
+        role_name: "Risk Management CV",
+        output_basename: "risk_management_cv",
+        basics: { ...BASE_BASICS, headline: "Risk Management Analyst | Controls, Reporting & Analytics" },
+        summary: [
+          "Risk management analyst with a structured approach to control monitoring, reporting, and risk assessment.",
+          "Combines analytical rigor with clear communication to support governance and operational decisions.",
+          "Experienced in dashboards, risk registers, incident tracking, and management reporting.",
+          "Supports teams with practical insights on exposure, mitigation progress, and emerging risk signals."
+        ],
+        skills: [
+          { category: "Risk Management", items: ["Risk Assessment", "Controls", "Governance"] },
+          { category: "Analytics", items: ["Excel", "SQL", "Power BI", "Reporting"] },
+          { category: "Operations", items: ["Process Mapping", "Issue Tracking", "Stakeholder Management"] }
+        ],
+        projects: [
+          { name: "Risk Register Dashboard", stack: "Power BI, Excel", description: "Built reporting views for risk ownership, severity, mitigation status, and overdue actions." },
+          { name: "Control Testing Tracker", stack: "Excel, SQL", description: "Structured control evidence tracking and exception summaries for management review." },
+          { name: "Incident Trend Analysis", stack: "Python, Power BI", description: "Analyzed recurring operational incidents and highlighted control improvement areas." }
+        ]
+      }
+    };
+
+    const TEMPLATES = {
+      summary: `<div class="entry-card row-with-remove"><textarea data-field="value"></textarea><button type="button" class="remove-btn" onclick="removeEntry(this)">Remove</button></div>`,
+      language: `<div class="entry-card row-with-remove"><input type="text" data-field="value"><button type="button" class="remove-btn" onclick="removeEntry(this)">Remove</button></div>`,
+      strength: `<div class="entry-card row-with-remove"><input type="text" data-field="value"><button type="button" class="remove-btn" onclick="removeEntry(this)">Remove</button></div>`,
+      project: `<div class="entry-card" data-entry="project"><div class="entry-headline"><strong>Project</strong><button type="button" class="remove-btn" onclick="removeEntry(this)">Remove</button></div><div class="field-grid"><label>Name<input type="text" data-field="name"></label><label>Stack<input type="text" data-field="stack"></label><label>Description<textarea data-field="description"></textarea></label></div></div>`,
+      education: `<div class="entry-card" data-entry="education"><div class="entry-headline"><strong>Education</strong><button type="button" class="remove-btn" onclick="removeEntry(this)">Remove</button></div><div class="field-grid"><label>Degree<input type="text" data-field="degree"></label><label>Institution<input type="text" data-field="institution"></label><label>Dates<input type="text" data-field="dates"></label><label>Location<input type="text" data-field="location"></label></div></div>`,
+      skill: `<div class="entry-card" data-entry="skill"><div class="entry-headline"><strong>Skill Group</strong><button type="button" class="remove-btn" onclick="removeEntry(this)">Remove</button></div><div class="field-grid"><label>Category<input type="text" data-field="category"></label><label>Items<input type="text" data-field="items" placeholder="Python, SQL, Power BI"></label></div></div>`,
+      experience: `<div class="entry-card" data-entry="experience"><div class="entry-headline"><strong>Experience</strong><button type="button" class="remove-btn" onclick="removeEntry(this)">Remove</button></div><div class="field-grid"><label>Title<input type="text" data-field="title"></label><label>Company<input type="text" data-field="company"></label><label>Dates<input type="text" data-field="dates"></label><label>Location<input type="text" data-field="location"></label></div><div class="nested-list" data-field="bullets"></div><button type="button" class="add-btn" onclick="addEntryTo(this.previousElementSibling, TEMPLATES.bullet)">Add Bullet</button></div>`,
+      bullet: `<div class="row-with-remove"><textarea data-field="value"></textarea><button type="button" class="remove-btn" onclick="removeEntry(this)">Remove</button></div>`
+    };
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function getInputValue(id) {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : "";
+    }
+
+    function setInputValue(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.value = value || "";
+    }
+
+    function addEntry(sectionId, template) {
+      const section = document.getElementById(sectionId);
+      if (!section) return null;
+      section.insertAdjacentHTML("beforeend", template);
+      renderPreview();
+      return section.lastElementChild;
+    }
+
+    function addEntryTo(section, template) {
+      if (!section) return null;
+      section.insertAdjacentHTML("beforeend", template);
+      renderPreview();
+      return section.lastElementChild;
+    }
+
+    function removeEntry(btn) {
+      const entry = btn.closest(".entry-card, .row-with-remove");
+      if (entry) entry.remove();
+      renderPreview();
+    }
+
+    function clearList(id) {
+      const list = document.getElementById(id);
+      if (list) list.innerHTML = "";
+    }
+
+    function setField(root, field, value) {
+      const el = root.querySelector(`[data-field="${field}"]`);
+      if (el) el.value = value || "";
+    }
+
+    function fieldValue(root, field) {
+      const el = root.querySelector(`[data-field="${field}"]`);
+      return el ? el.value.trim() : "";
+    }
+
+    function listValues(id) {
+      const list = document.getElementById(id);
+      if (!list) return [];
+      return Array.from(list.querySelectorAll('[data-field="value"]'))
+        .map((el) => el.value.trim())
+        .filter(Boolean);
+    }
+
+    function fillSimpleList(id, values, template) {
+      clearList(id);
+      values.forEach((value) => {
+        const entry = addEntry(id, template);
+        setField(entry, "value", value);
+      });
+    }
+
+    function fillExperience(entries) {
+      clearList("experienceList");
+      entries.forEach((item) => {
+        const entry = addEntry("experienceList", TEMPLATES.experience);
+        setField(entry, "title", item.title);
+        setField(entry, "company", item.company);
+        setField(entry, "dates", item.dates);
+        setField(entry, "location", item.location);
+        const bulletList = entry.querySelector('[data-field="bullets"]');
+        (item.bullets || []).forEach((bullet) => {
+          const row = addEntryTo(bulletList, TEMPLATES.bullet);
+          setField(row, "value", bullet);
+        });
+      });
+    }
+
+    function fillProjects(entries) {
+      clearList("projectsList");
+      entries.forEach((item) => {
+        const entry = addEntry("projectsList", TEMPLATES.project);
+        setField(entry, "name", item.name);
+        setField(entry, "stack", item.stack);
+        setField(entry, "description", item.description);
+      });
+    }
+
+    function fillEducation(entries) {
+      clearList("educationList");
+      entries.forEach((item) => {
+        const entry = addEntry("educationList", TEMPLATES.education);
+        setField(entry, "degree", item.degree);
+        setField(entry, "institution", item.institution);
+        setField(entry, "dates", item.dates);
+        setField(entry, "location", item.location);
+      });
+    }
+
+    function fillSkills(entries) {
+      clearList("skillsList");
+      entries.forEach((item) => {
+        const entry = addEntry("skillsList", TEMPLATES.skill);
+        setField(entry, "category", item.category);
+        setField(entry, "items", (item.items || []).join(", "));
+      });
+    }
+
+    function formToCV() {
+      const basics = {
+        name: getInputValue("basics-name"),
+        email: getInputValue("basics-email"),
+        phone: getInputValue("basics-phone"),
+        location: getInputValue("basics-location"),
+        linkedin: getInputValue("basics-linkedin"),
+        headline: getInputValue("basics-headline"),
+        photo: getInputValue("basics-photo"),
+        summary: listValues("summaryList")
+      };
+
+      return {
+        role_name: basics.headline || "Generated CV",
+        output_basename: (basics.headline || basics.name || "cv").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") || "cv",
+        show_github: true,
+        sections: {
+          summary: true,
+          education: true,
+          skills: true,
+          languages: true,
+          strengths: true,
+          experience: true,
+          projects: true
+        },
+        basics,
+        languages: listValues("languagesList"),
+        strengths: listValues("strengthsList"),
+        education: Array.from(document.querySelectorAll("#educationList [data-entry='education']")).map((entry) => ({
+          degree: fieldValue(entry, "degree"),
+          institution: fieldValue(entry, "institution"),
+          dates: fieldValue(entry, "dates"),
+          location: fieldValue(entry, "location")
+        })).filter((item) => item.degree || item.institution || item.dates || item.location),
+        skills: Array.from(document.querySelectorAll("#skillsList [data-entry='skill']")).map((entry) => ({
+          category: fieldValue(entry, "category"),
+          items: fieldValue(entry, "items").split(",").map((item) => item.trim()).filter(Boolean)
+        })).filter((item) => item.category || item.items.length),
+        experience: Array.from(document.querySelectorAll("#experienceList [data-entry='experience']")).map((entry, index) => ({
+          id: `experience-${index + 1}`,
+          title: fieldValue(entry, "title"),
+          company: fieldValue(entry, "company"),
+          dates: fieldValue(entry, "dates"),
+          location: fieldValue(entry, "location"),
+          bullets: Array.from(entry.querySelectorAll('[data-field="bullets"] [data-field="value"]')).map((el) => el.value.trim()).filter(Boolean)
+        })).filter((item) => item.title || item.company || item.dates || item.location || item.bullets.length),
+        projects: Array.from(document.querySelectorAll("#projectsList [data-entry='project']")).map((entry, index) => ({
+          id: `project-${index + 1}`,
+          name: fieldValue(entry, "name"),
+          stack: fieldValue(entry, "stack"),
+          description: fieldValue(entry, "description")
+        })).filter((item) => item.name || item.stack || item.description)
+      };
+    }
+
+    function fillForm(data) {
+      const basics = data.basics || {};
+      setInputValue("basics-name", basics.name);
+      setInputValue("basics-email", basics.email);
+      setInputValue("basics-phone", basics.phone);
+      setInputValue("basics-location", basics.location);
+      setInputValue("basics-linkedin", basics.linkedin);
+      setInputValue("basics-headline", basics.headline);
+      setInputValue("basics-photo", basics.photo);
+      fillSimpleList("summaryList", basics.summary || data.summary || [], TEMPLATES.summary);
+      fillExperience(data.experience || []);
+      fillProjects(data.projects || []);
+      fillEducation(data.education || []);
+      fillSkills(data.skills || []);
+      fillSimpleList("languagesList", data.languages || [], TEMPLATES.language);
+      fillSimpleList("strengthsList", data.strengths || [], TEMPLATES.strength);
+      renderPreview();
+    }
+
+    function loadProfile(profileKey) {
+      const profile = PROFILES[profileKey];
+      if (!profile) return;
+      fillForm({
+        role_name: profile.role_name,
+        output_basename: profile.output_basename,
+        basics: profile.basics,
+        summary: profile.summary,
+        skills: profile.skills,
+        projects: profile.projects,
+        education: [
+          { degree: "", institution: "", dates: "", location: "" }
+        ],
+        experience: [
+          { title: "", company: "", dates: "", location: "", bullets: [""] }
+        ],
+        languages: ["English", "French", "Arabic"],
+        strengths: ["Analytical Thinking -- Converts ambiguous questions into structured analysis"]
+      });
+    }
+
+    function loadJSON(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          fillForm(JSON.parse(reader.result));
+          const input = document.getElementById("uploadInput");
+          if (input) input.value = "";
+        } catch (error) {
+          alert(`Invalid JSON: ${error.message}`);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function uploadPhoto(file) {
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        alert("Please choose an image file.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        setInputValue("basics-photo", reader.result);
+        ["photoUploadInput", "topbarPhotoUploadInput"].forEach((id) => {
+          const input = document.getElementById(id);
+          if (input) input.value = "";
+        });
+        renderPreview();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function exportJSON() {
+      const payload = formToCV();
+      const blob = new Blob([JSON.stringify(payload, null, 2) + "\n"], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${payload.output_basename}.json`;
+      document.body.appendChild(link);
+      link.click();
+      URL.revokeObjectURL(link.href);
+      link.remove();
+    }
+
+    function downloadPDF() {
+      window.print();
+    }
+
+    function renderPreview() {
+      const data = formToCV();
+      const basics = data.basics;
+      document.getElementById("prev-name").textContent = basics.name;
+      document.getElementById("prev-headline").textContent = basics.headline;
+
+      const photo = document.getElementById("prev-photo");
+      if (basics.photo) {
+        photo.src = basics.photo;
+        photo.style.display = "";
+      } else {
+        photo.removeAttribute("src");
+        photo.style.display = "none";
+      }
+      photo.alt = basics.name || "Photo";
+
+      document.getElementById("prev-contact").innerHTML = [basics.email, basics.phone, basics.location, basics.linkedin]
+        .filter(Boolean)
+        .map((item) => `<p>${escapeHtml(item)}</p>`)
+        .join("");
+
+      document.getElementById("prev-summary").innerHTML = `<section class="content-block"><h2>Professional Summary</h2><ul>${basics.summary.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`;
+
+      document.getElementById("prev-experience").innerHTML = `<section class="content-block"><h2>Professional Experience</h2>${data.experience.map((entry) => `
+        <article class="entry">
+          <div class="entry-head">
+            <h3>${escapeHtml(entry.title)} | ${escapeHtml(entry.company)}</h3>
+            <span>${escapeHtml(entry.dates)}</span>
+          </div>
+          <p class="muted">${escapeHtml(entry.location)}</p>
+          <ul>${entry.bullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+        </article>`).join("")}</section>`;
+
+      document.getElementById("prev-projects").innerHTML = `<section class="content-block"><h2>Selected Projects</h2>${data.projects.map((project) => `
+        <article class="entry project">
+          <div class="entry-head">
+            <h3>${escapeHtml(project.name)}</h3>
+            <span>${escapeHtml(project.stack)}</span>
+          </div>
+          <p>${escapeHtml(project.description)}</p>
+        </article>`).join("")}</section>`;
+
+      document.getElementById("prev-education").innerHTML = `<section class="sidebar-block"><h2>Education</h2>${data.education.map((entry) => `
+        <article class="entry">
+          <div class="entry-head">
+            <h3>${escapeHtml(entry.degree)}</h3>
+            <span>${escapeHtml(entry.dates)}</span>
+          </div>
+          <p class="muted">${escapeHtml(entry.institution)} | ${escapeHtml(entry.location)}</p>
+        </article>`).join("")}</section>`;
+
+      document.getElementById("prev-skills").innerHTML = `<section class="sidebar-block"><h2>Skills</h2>${data.skills.map((group) => `
+        <section class="sidebar-block">
+          <h3>${escapeHtml(group.category)}</h3>
+          <p>${escapeHtml(group.items.join(", "))}</p>
+        </section>`).join("")}</section>`;
+
+      document.getElementById("prev-languages").innerHTML = `<section class="sidebar-block"><h2>Languages</h2><ul>${data.languages.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`;
+      document.getElementById("prev-strengths").innerHTML = `<section class="sidebar-block"><h2>Strengths</h2><ul>${data.strengths.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`;
+    }
+
+    document.addEventListener("input", renderPreview);
+    window.addEventListener("DOMContentLoaded", () => {
+      loadProfile("da");
+    });
+  </script>
+</body>
+</html>

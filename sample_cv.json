@@ -1,0 +1,93 @@
+{
+  "output_basename": "sample_cv",
+  "basics": {
+    "name": "Candidate Name",
+    "headline": "Data Analyst | Business Intelligence & Analytics",
+    "email": "candidate@example.com",
+    "phone": "+1 000 000 0000",
+    "location": "City, Country",
+    "linkedin": "https://linkedin.com/in/candidate",
+    "github": "https://github.com/candidate",
+    "photo": "",
+    "summary": [
+      "Data professional with experience across analytics, reporting, and business-oriented data solutions.",
+      "Strong foundation in Python, SQL, statistical reasoning, dashboarding, and transforming raw data into structured insights.",
+      "Comfortable working across analytical workflows from data preparation and validation to reporting and stakeholder communication."
+    ]
+  },
+  "education": [
+    {
+      "degree": "Degree or Certification",
+      "institution": "University or School Name",
+      "dates": "2020 -- 2024",
+      "location": "City, Country"
+    }
+  ],
+  "skills": [
+    {
+      "category": "Analytics & Modeling",
+      "items": ["Statistical analysis", "Machine learning", "Predictive modeling", "Forecasting"]
+    },
+    {
+      "category": "Programming & Tools",
+      "items": ["Python", "SQL", "Power BI", "Excel"]
+    },
+    {
+      "category": "Data Workflows",
+      "items": ["Data cleaning", "Feature engineering", "ETL", "Reporting", "Visualization"]
+    }
+  ],
+  "experience": [
+    {
+      "title": "Data Analyst",
+      "company": "Example Company",
+      "dates": "2023 -- Present",
+      "location": "City, Country",
+      "bullets": [
+        "Delivered analytics dashboards and reports that improved visibility into business performance.",
+        "Built reusable data preparation workflows to reduce manual reporting effort.",
+        "Partnered with stakeholders to define metrics, validate data, and communicate actionable insights."
+      ]
+    },
+    {
+      "title": "Data Intern",
+      "company": "Example Organization",
+      "dates": "2022 -- 2023",
+      "location": "City, Country",
+      "bullets": [
+        "Supported exploratory analysis and data quality checks for reporting projects.",
+        "Prepared clean datasets and documented assumptions for recurring analysis."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Customer Analytics Dashboard",
+      "stack": "Python | SQL | Power BI",
+      "description": "Built a dashboard to monitor customer behavior, segment performance, and key business metrics."
+    },
+    {
+      "name": "Data Cleaning Pipeline",
+      "stack": "Python | pandas",
+      "description": "Developed a reusable workflow to profile CSV files, clean fields, and export analysis-ready datasets."
+    }
+  ],
+  "languages": [
+    "English -- Professional",
+    "French -- Professional"
+  ],
+  "strengths": [
+    "Structured problem solving -- clear approach to ambiguous analytical questions.",
+    "Stakeholder collaboration -- able to work smoothly with business and technical teams.",
+    "Ownership -- reliable execution from data preparation to final insight delivery."
+  ],
+  "sections": {
+    "summary": true,
+    "education": true,
+    "skills": true,
+    "languages": true,
+    "strengths": true,
+    "experience": true,
+    "projects": true
+  }
+}
